@@ -1,0 +1,91 @@
+#!/bin/bash
+
+
+service_list() {
+    echo "Running: systemctl list-units --type=service"
+    systemctl list-units --type=service
+}
+
+
+system_load() {
+    echo "Running: uptime"
+    uptime
+}
+
+
+service_start() {
+    local service_name=$1
+    if [[ -z "$service_name" ]]; then
+        echo "Error: No service name provided. Usage: $0 service start <service-name>"
+        exit 1
+    fi
+    echo "Starting service: $service_name"
+    systemctl start "$service_name"
+    if [[ $? -eq 0 ]]; then
+        echo "Service '$service_name' started successfully."
+    else
+        echo "Failed to start service '$service_name'."
+    fi
+}
+
+
+service_stop() {
+    local service_name=$1
+    if [[ -z "$service_name" ]]; then
+        echo "Error: No service name provided. Usage: $0 service stop <service-name>"
+        exit 1
+    fi
+    echo "Stopping service: $service_name"
+    systemctl stop "$service_name"
+    if [[ $? -eq 0 ]]; then
+        echo "Service '$service_name' stopped successfully."
+    else
+        echo "Failed to stop service '$service_name'."
+    fi
+}
+
+
+disk_usage() {
+    echo "Running: df -h"
+    df -h
+}
+
+
+process_monitor() {
+    echo "Running: top"
+    top
+}
+
+
+logs_analyze() {
+    echo "Running: journalctl -p crit --since '1 hour ago'"
+    journalctl -p crit --since '1 hour ago'
+}
+
+
+
+if [[ "$1" == "service" && "$2" == "list" ]]; then
+    service_list
+elif [[ "$1" == "system" && "$2" == "load" ]]; then
+    system_load
+elif [[ "$1" == "service" && "$2" == "start" ]]; then
+    service_start "$3"
+elif [[ "$1" == "service" && "$2" == "stop" ]]; then
+    service_stop "$3"
+elif [[ "$1" == "disk" && "$2" == "usage" ]]; then
+    disk_usage
+elif [[ "$1" == "process" && "$2" == "monitor" ]]; then
+    process_monitor
+elif [[ "$1" == "logs" && "$2" == "analyze" ]]; then
+    logs_analyze
+else
+    echo "Invalid command. Usage:"
+    echo "$0 service list"
+    echo "$0 system load"
+    echo "$0 service start <service-name>"
+    echo "$0 service stop <service-name>"
+    echo "$0 disk usage"
+    echo "$0 process monitor"
+    echo "$0 logs analyze"
+    exit 1
+fi
